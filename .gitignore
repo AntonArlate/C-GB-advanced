@@ -2,3 +2,4 @@
 *.exe
 *.o
 output/
+lesson_2/snake.c
