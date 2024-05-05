@@ -47,7 +47,7 @@ snake_t initSnake(int x, int y, size_t tsize) {
     return snake;
 }
 
-void draw_field(){
+void drawField(){
     char matrix[MAX_X][MAX_Y];
     for (int i = 0; i < MAX_X; ++i)
     {
@@ -60,7 +60,7 @@ void draw_field(){
 
 void draw_snake(snake_t *snake, tail_t *to_remove, int remove_count);
 // Функция для перемещения змеи
-void move_snake(snake_t *snake, Direction direction) {
+void moveSnake(snake_t *snake, Direction direction) {
     // Сохраняем последний элемент хвоста
     tail_t * last_tail_p = &(snake->tail[snake->tsize - 1]);
     tail_t last_tail = *last_tail_p;
@@ -175,7 +175,7 @@ int	main(int argc, char **argv)
     Direction direction = DOWN;
     snake_t snake = initSnake(10, 5, 5);
     // рисуем поле
-    draw_field();
+    drawField();
 
     // основной цикл программы 
     unsigned long long cicle = 0;
@@ -216,7 +216,7 @@ int	main(int argc, char **argv)
             // сразу переписываем время следующего движения
             target_move_cile = cicle + move_dalay;
             // Перемещаем змею
-            move_snake(&snake, direction);
+            moveSnake(&snake, direction);
         }
     }
     
