@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <unistd.h>
-#include <pthread.h>
 #include <ctype.h>
 #include <time.h>
 #include <windows.h>
@@ -312,7 +311,7 @@ int	main(int argc, char **argv)
         clock_t currentTime = clock(); // Текущее время
         usleep(100); // задержка для снижения процессорной нагрузки от вызова основного цикла программы
         // запускаем цикл кадра. Для начала к нему будет привязана только функция отслеживания нажатий
-        while ((double)(currentTime) / CLOCKS_PER_SEC > targetFrameTime) {
+        if ((double)(currentTime) / CLOCKS_PER_SEC > targetFrameTime) {
             targetFrameTime += TARGET_FRAME_TIME; // Сдвинуть целевое время выполнения следующего кадра
 
             // Проверка нажатия клавиш
@@ -355,7 +354,7 @@ int	main(int argc, char **argv)
         }
        
         // цикл отвечающий за перемещение змейки
-        while ((double)(currentTime) / CLOCKS_PER_SEC > targetSpeedTime) {
+        if ((double)(currentTime) / CLOCKS_PER_SEC > targetSpeedTime) {
 
             // если последняя зафиксированая кнопка отличается от предыдущей
             if (last_press != direction)
