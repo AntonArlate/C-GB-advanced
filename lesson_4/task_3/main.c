@@ -40,7 +40,7 @@ int search_prefix(char *s1, char *s2)
     int result[l2];
     memset(result, 0, l2 * sizeof(int));
 
-    int p2 = l2 - min_l + 1;
+    int p2 = l2 - min_l;
     int p1 = 0;
 
     while (p2 < l2)
