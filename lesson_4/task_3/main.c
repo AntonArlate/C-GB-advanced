@@ -43,28 +43,27 @@ int search_prefix(char *s1, char *s2)
     int p2 = l2 - min_l;
     int p1 = 0;
 
-    while (p2 < l2)
-    {
-        if (s1[p1] != s2[p2])
-        {
-            if (p1 == 0)
-            {
+    while (p2 < l2) {
+        if (s1[p1] != s2[p2]) {
+            if (p1 == 0) {
                 result[p2] = 0;
-            }
-            else
-            {
+            } else {
                 p1 = result[p1 - 1];
             }
 
             p2++;
-        }
-        else
-        {
+        } else {
             result[p2] = p1 + 1;
             p2++;
             p1++;
         }
     }
+
+    printf("Pivot array: ");
+    for (int i = 0; i < l2; i++) {
+        printf("%d ", result[i]);
+    }
+    printf("\n");
 
     return result[l2 - 1];
 }
