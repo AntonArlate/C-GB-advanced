@@ -81,27 +81,65 @@ typedef struct snake_t
     bool control_ai;
 } snake_t;
 
+// Генерация еды. Принимает указатель food_t в который записывает новые координаты
 void generationFood(food_t *food, snake_t **snakes, int snake_count);
-void drawFood(food_t food);
-snake_t* initSnake(int x, int y, size_t tsize);
+
+// Алшоритм "сбора"
 void eatSnake(snake_t *snake, tail_t *tail_tip);
+
+/*Функции рендера информации на экране*/
+// Отображение еды
+void drawFood(food_t food);
+// Отображение поля с статичными перпятситвиями
 void drawField();
+/* Отрисовка змейки ориентированая на зауск в стандартной консоли Windows 10. В других системах работоспособность не гарантируется
+ tail_t *to_remove : массив устаревших элементов хвоста которые должны быть стёрты на следующем кадре
+ int remove_count : количество элементов в переданом массиве*/ 
 void drawSnakeWindows(snake_t *snake, tail_t *to_remove, int remove_count);
-void drawSnakeANSI(snake_t *snake, tail_t *to_remove, int remove_count);
+
+// Инициализация змейки с настройками по умолчанию
+snake_t* initSnake(int x, int y, size_t tsize);
+
+// Стандартная проверка физической возможности смены направления
 int newDirectIsValid(Direction current_direct, Direction new_direct);
+
+/* Сложный алгоритм определения свободности ячейки. Может быть заменён на другой с условием возврата валидных значений
+0 - free
+1 - snake
+2 - wall
+*/
 int checkCoordState(snake_t **snakes, short num_snakes, int chk_x, int chk_y);
+
+// Перемещение змейки на одну позицию. Считывает Direction из переданой структуры и переписывает необходимые данные о местоположении.
 void moveSnake(snake_t *snake);
-void drawSnakeWindows(snake_t *snake, tail_t *to_remove, int remove_count);
-void drawSnakeANSI(snake_t *snake, tail_t *to_remove, int remove_count);
+
+// Функция конвертирует переданую клавишу в направление. Если успешно - обновлят поле direct в структуре
 void conversionKeyToDirect(char key_detect, snake_t *snake);
+
+// Тестовый AI алгоритм.
 void aiSnake(snake_t *snake, food_t *food);
-void cursorDefaulPosition();
+// AI алгоритм v2
 void aiSnake2(snake_t **snakes, short num_snakes, snake_t *snake, food_t *food);
+
+// Установка курсора в позицию за игровым полем.
+void cursorDefaulPosition();
+
+/* Функция генерации строк с переменной информацией.
+ ВНИМАНИЕ: возвращает указатель на динамически выделенную память. После использования указатель должен быть очищен.*/ 
 char* generateString(const char *format, ...);
+// Очистка памяти выделенной для строки
 void freeGeneratedString(char *str);
+/* Отображение нескольких строк меню.
+ ВНИМАНИЕ: Ожидает указатели на динамическую память, после отображения память освобождается.*/
 char displayMenu(char *menuItems[], int numItems);
-char *getColorSequence(char color);
-void options_f();
+
+/*Функционал меню*/
+// Стартовое меню
 void startMenu();
+// Меню опций
+void options_f();
+
+// Преобразователь символа в цветовую константу. Неиспользуемый функционал, требовался для настройки цвета пользователем.
+char *getColorSequence(char color);
 
 #endif // SNAKE_H

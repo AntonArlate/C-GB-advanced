@@ -1,58 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <conio.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <time.h>
-#include <windows.h>
-
-// Значения по умолчанию
-#define MAX_X 40
-int MAX_Y = 20;
-#define SNAKE_COUNT_DEFAULT 5
-
-// Определение цветов ANSI
-#define ANSI_COLOR_RED "\x1b[31m"
-#define ANSI_COLOR_GREEN "\x1b[32m"
-#define ANSI_COLOR_YELLOW "\x1b[33m"
-#define ANSI_COLOR_BLUE "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN "\x1b[36m"
-#define ANSI_COLOR_ORANGE "\x1b[38;5;208m"
-#define ANSI_COLOR_PURPLE "\x1b[38;5;93m"
-#define ANSI_COLOR_PINK "\x1b[38;5;205m"
-#define ANSI_COLOR_RESET "\x1b[0m"
-
-// Направления движения
-typedef enum
-{
-    UP,
-    RIGHT,
-    DOWN,
-    LEFT,
-} Direction;
-
-typedef enum
-{
-    false = 0,
-    true = 1
-} bool;
-
-// Опции
-typedef struct options_t
-{
-    int snake_count;
-    char *colors[9];
-} options_t;
-
-typedef struct sensor_t
-{
-    Direction sens_direct;
-    int sens_data;
-} sensor_t;
+#include "shake.h"
 
 // До меню инициализируем стандартные значения изменяемых пользователем параметров
 // Переменная опций создаётся глобально, чтобы не перекидывать её постоянно по функциям
+int MAX_Y = 20;
 options_t opts = {
     .snake_count = SNAKE_COUNT_DEFAULT,
     .colors[0] = ANSI_COLOR_RED,
@@ -65,35 +15,6 @@ options_t opts = {
     .colors[7] = ANSI_COLOR_PURPLE,
     .colors[8] = ANSI_COLOR_PINK,
 };
-
-// еда
-typedef struct food_t
-{
-    int x;
-    int y;
-} food_t;
-
-// элемент хвоста
-typedef struct tail_t
-{
-    int x;
-    int y;
-} tail_t;
-
-// змея
-typedef struct snake_t
-{
-    long score;
-    double speed;
-    int x;
-    int y;
-    struct tail_t *tail;
-    size_t tsize;
-    Direction direct;
-    const char *color;
-    short ID;
-    bool control_ai;
-} snake_t;
 
 void generationFood(food_t *food, snake_t **snakes, int snake_count)
 {
@@ -226,10 +147,6 @@ void drawField()
         printf("\n");
     }
 }
-
-void drawSnakeWindows(snake_t *snake, tail_t *to_remove, int remove_count);
-void drawSnakeANSI(snake_t *snake, tail_t *to_remove, int remove_count);
-int newDirectIsValid(Direction current_direct, Direction new_direct);
 
 /*
 // Функция проверки доступности координаты для перемещения
@@ -365,25 +282,6 @@ void drawSnakeWindows(snake_t *snake, tail_t *to_remove, int remove_count)
     printf("%s", ANSI_COLOR_RESET);
 }
 
-void drawSnakeANSI(snake_t *snake, tail_t *to_remove, int remove_count)
-{
-    COORD coord;
-    // Удаляем хвост
-    for (int i = 0; i < remove_count; i++)
-    {
-        printf("\033[%d;%dH ", to_remove[i].y, to_remove[i].x);
-    }
-
-    // Рисуем голову
-    printf("\033[%d;%dH@", snake->y, snake->x);
-
-    // Рисуем хвост
-    for (int i = 0; i < snake->tsize; i++)
-    {
-        printf("\033[%d;%dH#", snake->tail[i].y, snake->tail[i].x);
-    }
-}
-
 // преобразователь нажатых клавиш в направление
 // Принимает 2 игрока
 void conversionKeyToDirect(char key_detect, snake_t *snake)
@@ -498,18 +396,10 @@ void aiSnake2(snake_t **snakes, short num_snakes, snake_t *snake, food_t *food)
     int down_position_status = checkCoordState(snakes, num_snakes, snake->x, snake->y + 1);
     int left_position_status = checkCoordState(snakes, num_snakes, snake->x - 1, snake->y);
 
-    // printf("UP = %d\nRIGHT = %d\nDOWN = %d\nLEFT = %d", up_position_status, right_position_status, down_position_status, left_position_status);
-
     Direction go_in = 9999;
     int algorytm_steps = 5;
     sensor_t *sensors_priority [algorytm_steps];
-    short chk_counter = 0;
-
-    // for (int i = 0; i < algorytm_steps; i++)
-    // {
-    //     sensors_priority[i] = malloc(sizeof(sensor_t));
-    // }
-    
+    short chk_counter = 0; 
 
     // Создаём массив приоритетов проверки
     while (chk_counter < algorytm_steps && go_in > 999)
@@ -524,7 +414,6 @@ void aiSnake2(snake_t **snakes, short num_snakes, snake_t *snake, food_t *food)
             {
                 sensors_priority[chk_counter]->sens_direct = UP;
                 sensors_priority[chk_counter]->sens_data = 1;
-                // chk_counter = 3;
                 break;
             }
             
@@ -624,10 +513,6 @@ void aiSnake2(snake_t **snakes, short num_snakes, snake_t *snake, food_t *food)
         snake->direct = go_in;
 
     // очищаем память
-    // for (int i = 0; i < algorytm_steps; i++)
-    // {
-    //     free(sensors_priority[i]);
-    // }
     while (chk_counter > 0)
     {
         chk_counter --;
@@ -714,8 +599,6 @@ void options_f()
         char *menuItems[] = {
             generateString("SNAKE GAME\n"),
             generateString("Menu -> Options:"),
-            // generateString("%s1. Color 1 player%s", opts.color1, ANSI_COLOR_RESET),
-            // generateString("%s2. Color 2 player%s", opts.color2, ANSI_COLOR_RESET),
             generateString("1. Change snakes: current = %d", opts.snake_count),
             generateString("0. Return"),
             generateString("Enter the menu item number: ")};
@@ -725,16 +608,6 @@ void options_f()
         int input;
         switch (choice)
         {
-        // case '1':
-        //     printf("Choice color then enter firs char RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN or another RESET: ");
-        //     scanf(" %c", &color);
-        //     opts.color1 = getColorSequence(color);
-        //     break;
-        // case '2':
-        //     printf("Choice color then enter firs char RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN or another RESET");
-        //     scanf(" %c", &color);
-        //     opts.color2 = getColorSequence(color);
-        //     break;
         case '1':
             printf("Enter number (1-9): ");
             scanf("%d", &input);
@@ -844,6 +717,7 @@ int main(int argc, char **argv)
     short game_end = 0;
 
     int score = 0;
+    int index_snake_error = -1;
 
     while (!game_end)
     {
@@ -927,9 +801,11 @@ int main(int argc, char **argv)
                     tail_t last_tail = *last_tail_p;
                     moveSnake(snakes[i]);
                     // Проверяем что змея не столкнулась ни с чем
-                    if (checkCoordState(snakes, snake_count, snakes[i]->x, snakes[i]->y))
+                    int state = checkCoordState(snakes, snake_count, snakes[i]->x, snakes[i]->y);
+                    if (state)
                     {
-                        game_end = 1;
+                        index_snake_error = i;
+                        game_end = state;
                         break;
                     }
                     // Запускаем AI для неуправляемых змей
@@ -964,7 +840,25 @@ int main(int argc, char **argv)
     }
     printf("\n");
     system("cls");
-    printf("Score: %d\n", score);
+
+    if (index_snake_error >= 0)
+    {
+        printf("Error move snake [%d] \nerror code: %d\nCoords: X-%d;Y-%d\n \n", 
+        index_snake_error+1, game_end, snakes[index_snake_error]->x, snakes[index_snake_error]->y);
+    }
+    
+
+    for (size_t i = 0; i < snake_count; i++)
+    {   
+        // Устанавливаем цветовой код
+        printf("%s", snakes[i]->color);
+        printf("Score snake [%d]: %d\n", i+1, snakes[i]->score);
+        printf("Final lenght: %d\n\n", snakes[i]->tsize);
+        score += snakes[i]->score;
+    }
+    printf("%s", ANSI_COLOR_RESET);
+    
+    printf("Score ALL: %d\n", score);
     system("\npause");
     return 0;
 }
