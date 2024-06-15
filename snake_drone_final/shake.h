@@ -14,6 +14,7 @@
 #define MAX_X 40
 extern int MAX_Y;
 #define SNAKE_COUNT_DEFAULT 5
+#define SNAKE_SPEED_DEFAULT 100
 
 // Определение цветов ANSI
 #define ANSI_COLOR_RED "\x1b[31m"
@@ -40,6 +41,7 @@ typedef enum
 typedef struct options_t
 {
     int snake_count;
+    int snake_speed_default;
     char *colors[9];
 } options_t;
 
