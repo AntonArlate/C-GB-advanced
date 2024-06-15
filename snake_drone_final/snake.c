@@ -5,6 +5,7 @@
 int MAX_Y = 20;
 options_t opts = {
     .snake_count = SNAKE_COUNT_DEFAULT,
+    .snake_speed_default = SNAKE_SPEED_DEFAULT,
     .colors[0] = ANSI_COLOR_RED,
     .colors[1] = ANSI_COLOR_GREEN,
     .colors[2] = ANSI_COLOR_YELLOW,
@@ -600,6 +601,7 @@ void options_f()
             generateString("SNAKE GAME\n"),
             generateString("Menu -> Options:"),
             generateString("1. Change snakes: current = %d", opts.snake_count),
+            generateString("2. Change default speed: current = %d", opts.snake_speed_default),
             generateString("0. Return"),
             generateString("Enter the menu item number: ")};
         int numItems = sizeof(menuItems) / sizeof(menuItems[0]);
@@ -620,6 +622,19 @@ void options_f()
                 printf("Invalid input. Please enter a digit from 1 to 9.\n");
             }
             break;
+        case '2':
+            printf("Enter new speed steps per second (1-200): ");
+            scanf("%d", &input);
+            if (input >= 1 && input <= 200)
+            {
+                opts.snake_speed_default = input;
+            }
+            else
+            {
+                printf("Invalid input. Please enter a from 1 to 200.\n");
+            }
+            break;
+        
         case '0':
             running = 0;
             break;
@@ -697,7 +712,7 @@ int main(int argc, char **argv)
     {
         snake_t *new_snake = initSnake(i * 2 + 2, i * 2 + 2, 1);
         new_snake->color = opts.colors[i];
-        new_snake->speed = DEFAULT_SPEED;
+        new_snake->speed = opts.snake_speed_default;
         new_snake->ID = i;
         snakes[i] = new_snake;
         target_time_snakesMove[i] = (double)programStartTime / CLOCKS_PER_SEC + DEFAULT_SPEED_TIME;
@@ -826,7 +841,7 @@ int main(int argc, char **argv)
                         // speedSnake += SPEED_INCREASE;
                         // speedFrameTime = 1.0 / speedSnake;
                         snakes[i]->score += 1;
-                        snakes[i]->speed = DEFAULT_SPEED * (1.0 - (SPEED_DECREASE * (snakes[i]->tsize + 1)));
+                        snakes[i]->speed = opts.snake_speed_default * (1.0 - (SPEED_DECREASE * (snakes[i]->tsize + 1)));
                     }
                 }
                 drawFood(food);
